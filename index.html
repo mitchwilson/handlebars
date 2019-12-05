@@ -3,16 +3,147 @@
   <head>
     <meta charset="utf-8">
     <title>Handlebars</title>
+    <style type="text/css">
+      .redText {color: red;}
+      .blueText {color: blue;}
+      .greenText {color: green;}
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
   </head>
   <body>
+    <!-- Tutorial URL https://www.youtube.com/watch?v=4HuAnM6b2d8 -->
     <div id="personData"></div>
-    <script>
+    <script type="text/javascript">
       var myInfo = "<p>My name is {{name}} and I live at {{street}} in {{city}}, {{state}}</p>";
       var template = Handlebars.compile(myInfo);
       var data = template({name: "Mitch", street: "4720 Chesney Ridge", city: "Austin", state: "TX"});
-
       document.getElementById("personData").innerHTML += data;
+    </script>
+
+    <div id="quoteData"></div>
+    <script id="quote-template" type="text/x-handlebars-template">
+      <h3>Favorite {{name}} Quotes</h3>
+      <ol>
+        {{#each quotes}}
+        <li>{{quote}}</li>
+        {{/each}}
+      </ol>
+      {{{yogiBio}}}<br/><br/>
+      {{makeLink "Yogi Berra Museum" "http://yogiberramuseum.org/"}}<br />
+      {{changeColor "Make my text red" color="red"}}<br />
+      {{sayHello}}
+    </script>
+    <script type="text/javascript">
+      var quoteInfo = document.getElementById("quote-template").innerHTML;
+      var template = Handlebars.compile(quoteInfo);
+      Handlebars.registerHelper("makeLink", function(text, url) {
+        text = Handlebars.Utils.escapeExpression(text);
+        url = Handlebars.Utils.escapeExpression(url);
+        var theLink = '<a href="' + url + '">' + text + '</a>';
+
+        return new Handlebars.SafeString(theLink);
+      });
+      Handlebars.registerHelper("changeColor", function(text, options) {
+        text = Handlebars.Utils.escapeExpression(text);
+        if(options.hash.color === "red") {
+          return new Handlebars.SafeString("<span class='redText'>" + text + "</span>");
+        } else if (options.hash.color === "blue") {
+          return new Handlebars.SafeString("<span class='blueText'>" + text + "</span>");
+        } else {
+          return new Handlebars.SafeString("<span class='greenText'>" + text + "</span>");
+        }
+      });
+      Handlebars.registerHelper("sayHello", function(options) {
+        switch(options.data.lang) {
+          case "spanish":
+            return "Hola";
+            break;
+          case "french":
+            return "Bonjour";
+            break;
+          default:
+            return "Hello";
+        }
+      });
+      var quoteData = template({
+        name: "Yogi Berra",
+        quotes: [
+          {quote: "If you don't know where are you going, you might wind up someplace else."},
+          {quote: "You better cut pizza the pizza in four pieces because I'm not hungry enough to eat six."},
+          {quote: "I never said most of the things I said."},
+          {quote: "Nobody goes there anymore because it's too crowded."}
+        ],
+        yogiBio: '<i>Lawrence Peter "Yogi" Berra (May 12, 1925 - September 22, 2015) was an American professional baseball catcher, manager and coach.</i>'
+      }, {data: {
+        lang: "spanish"
+      }});
+
+      document.getElementById("quoteData").innerHTML += quoteData;
+    </script>
+
+    <div id="contentDiv"></div>
+    <script id="the-template" type="text/x-handlebars-template">
+      {{#makeRadio "size"}}
+        Small
+        Medium
+        Large
+      {{/makeRadio}}
+      {{#areEqual 1 1}}
+        Numbers are equal.
+      {{else}}
+        Numbers are not equal.
+      {{/areEqual}}<br />
+      {{#if "isActive"}}
+        Active
+      {{else}}
+        Not active
+      {{/if}}
+      <div class="potter-1">
+        <h3>{{title}}</h3>
+        {{#with techData}}
+          <div class="isbn">{{{isbn}}}</div>
+          <div class="author">{{{author}}}</div>
+        {{/with}}
+      </div>
+    </script>
+    <script type="text/javascript">
+      var templateInfo = document.getElementById("the-template").innerHTML;
+      var template = Handlebars.compile(templateInfo);
+      Handlebars.registerHelper("makeRadio", function(name, options) {
+        var radioList = options.fn();
+        radioList = radioList.trim().split("\n");
+        var output = "";
+        for(var val in radioList) {
+          var item = radioList[val].trim();
+          output += '<input type="radio" name="' + name + '"value="' + item + '">' + item + '<br/>';
+        }
+        return output;
+      });
+      Handlebars.registerHelper("areEqual", function(num1, num2, options) {
+        if(num1 === num2) {
+          return options.fn(this);
+        } else {
+          return options.inverse(this);
+        }
+      });
+      Handlebars.registerHelper("if", function(data, options) {
+        if(data === "isActive") {
+          return options.fn(this);
+        } else {
+          return options.inverse(this);
+        }
+      });
+      Handlebars.registerHelper("with", function(context, options) {
+        return options.fn(context);
+      });
+      var templateData = template({
+        title: "Harry Potter and the Philosopher's Stone",
+        techData: {
+          isbn: "0-7475-3269-9",
+          author: "J.K. Rowling"
+        }
+      });
+      document.getElementById("contentDiv"). innerHTML += templateData;
     </script>
   </body>
 </html>
