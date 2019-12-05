@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Handlebars</title>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+  </head>
+  <body>
+    <div id="personData"></div>
+    <script>
+      var myInfo = "<p>My name is {{name}} and I live at {{street}} in {{city}}, {{state}}</p>";
+      var template = Handlebars.compile(myInfo);
+      var data = template({name: "Mitch", street: "4720 Chesney Ridge", city: "Austin", state: "TX"});
+
+      document.getElementById("personData").innerHTML += data;
+    </script>
+  </body>
+</html>
